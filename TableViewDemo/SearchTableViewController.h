@@ -1,5 +1,5 @@
 //
-//  MasterViewController.h
+//  SearchTableViewController.h
 //  TableViewDemo
 //
 //  Created by Brandon Trebitowski on 1/29/15.
@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MasterViewController : UITableViewController
+typedef void (^SearchCallBackBlock) (NSString *result);
 
+@interface SearchTableViewController : UITableViewController
 
 @end
-
