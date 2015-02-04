@@ -11,5 +11,5 @@
 typedef void (^SearchCallBackBlock) (NSString *result);
 
 @interface SearchTableViewController : UITableViewController
-
+@property(nonatomic, strong) NSDictionary *speciesDictionary;
 @end

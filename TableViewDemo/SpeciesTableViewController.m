@@ -1,37 +1,35 @@
 //
-//  SearchTableViewController.m
+//  SpeciesTableViewController.m
 //  TableViewDemo
 //
-//  Created by Brandon Trebitowski on 1/29/15.
+//  Created by Brandon Trebitowski on 2/4/15.
 //  Copyright (c) 2015 Pixegon. All rights reserved.
 //
 
+#import "SpeciesTableViewController.h"
+#import "SpeciesTableViewCell.h"
 #import "SearchTableViewController.h"
-#import "CharacteristicSelectionTableViewController.h"
 
-@interface SearchTableViewController ()
-@property(nonatomic, strong) NSString *characteristic1;
-@property(nonatomic, strong) NSString *characteristic2;
-@property(nonatomic, strong) NSString *characteristic3;
-@property(nonatomic, strong) NSMutableArray *characteristics;
+@interface SpeciesTableViewController ()
+@property(nonatomic, strong) NSArray *speciesArray;
 @end
 
-@implementation SearchTableViewController
+@implementation SpeciesTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     
-    // Preset startup model
-    self.title = @"Characteristics";
-    // Set some defaults
-    self.characteristics = [@[@"Flexible",@"Rigid",@"Highly Flexible"] mutableCopy];
-    // Background image
-}
-
-- (void) viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    [self.tableView reloadData];
+    // Uncomment the following line to preserve selection between presentations.
+    // self.clearsSelectionOnViewWillAppear = NO;
+    
+    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+    self.speciesArray = @[
+                          @{@"name" : @"Fish", @"image_url" : @"https://cdn4.iconfinder.com/data/icons/free-scuba-diving-icon-set/128/fish.png"},
+                          @{@"name" : @"Horse", @"image_url" : @"http://massimorighi.com/wp-content/uploads/horse.jpg"}
+                          ];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -43,66 +41,28 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // Return the number of sections.
-    return 2;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    if(section == 1) {
-        return self.characteristics.count;
-    } else {
-        return 1;
-    }
+    return self.speciesArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    SpeciesTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     
     // Configure the cell...
-    
-    if(indexPath.section == 1) {
-        cell.textLabel.text = [NSString stringWithFormat:@"Characteristic %ld",(long)indexPath.row+1];
-        cell.detailTextLabel.text = self.characteristics[indexPath.row];
-
-    } else {
-        cell.textLabel.text = self.speciesDictionary[@"name"];
-        cell.detailTextLabel.text = @"";
-    }
-    
+    cell.speciesDictionary = self.speciesArray[indexPath.row];
     return cell;
 }
 
-- (NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 1) {
-        return @"Define its characteristics.";
-    } else {
-        return @"Species";
-    }
-}
-
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    
-    if ([segue.identifier isEqualToString:@"selectCharacteristics"]) {
-        CharacteristicSelectionTableViewController *controller = segue.destinationViewController;
+    if ([segue.identifier isEqualToString:@"segueSearch"]) {
         NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
-        SearchCallBackBlock callbackBlock = ^(NSString *result) {            
-            self.characteristics[indexPath.row] = result;
-        };
-        controller.callbackBlock = callbackBlock;        
-    }
-}
-
-- (BOOL) shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
-    NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
-    if (indexPath.section == 0) {
-        return NO;
-    }
-    return YES;
-}
-
-- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 0) {
-        [self.navigationController popViewControllerAnimated:YES];
+        NSDictionary *speciesDictionary = self.speciesArray[indexPath.row];
+        SearchTableViewController *controller = segue.destinationViewController;
+        controller.speciesDictionary = speciesDictionary;
     }
 }
 
