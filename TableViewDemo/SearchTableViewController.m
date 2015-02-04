@@ -13,7 +13,7 @@
 @property(nonatomic, strong) NSString *characteristic1;
 @property(nonatomic, strong) NSString *characteristic2;
 @property(nonatomic, strong) NSString *characteristic3;
-@property(nonatomic, strong) NSMutableDictionary *characteristics;
+@property(nonatomic, strong) NSMutableArray *characteristics;
 @end
 
 @implementation SearchTableViewController
@@ -24,8 +24,8 @@
     
     // Preset startup model
     self.title = @"Characteristics";
-    // Dynamic properties
-    self.characteristics = [@{} mutableCopy];
+    // Set some defaults
+    self.characteristics = [@[@"Flexible",@"Rigid",@"Highly Flexible"] mutableCopy];
     // Background image
 }
 
@@ -43,40 +43,41 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // Return the number of sections.
-    return 1;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    return 3;
+    if(section == 1) {
+        return self.characteristics.count;
+    } else {
+        return 1;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     
     // Configure the cell...
-    switch (indexPath.row) {
-        case 0:
-            cell.textLabel.text = @"Characteristic 1";
-            cell.detailTextLabel.text = self.characteristic1;
-            break;
-        case 1:
-            cell.textLabel.text = @"Characteristic 2";
-            cell.detailTextLabel.text = self.characteristic2;
-            break;
-        case 2:
-            cell.textLabel.text = @"Characteristic 3";
-            cell.detailTextLabel.text = self.characteristic3;
-            break;
-        default:
-            break;
+    
+    if(indexPath.section == 1) {
+        cell.textLabel.text = [NSString stringWithFormat:@"Characteristic %ld",(long)indexPath.row+1];
+        cell.detailTextLabel.text = self.characteristics[indexPath.row];
+
+    } else {
+        cell.textLabel.text = @"Fish";
+        cell.detailTextLabel.text = @"";
     }
     
     return cell;
 }
 
 - (NSString *) tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return @"Define its characteristics.";
+    if (section == 1) {
+        return @"Define its characteristics.";
+    } else {
+        return @"Some other section";
+    }
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -85,21 +86,25 @@
         CharacteristicSelectionTableViewController *controller = segue.destinationViewController;
         NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
         SearchCallBackBlock callbackBlock = ^(NSString *result) {            
-            switch (indexPath.row) {
-                case 0:
-                    self.characteristic1 = result;
-                    break;
-                case 1:
-                    self.characteristic2 = result;
-                    break;
-                case 2:
-                    self.characteristic3 = result;
-                    break;
-                default:
-                    break;
-            }
+            self.characteristics[indexPath.row] = result;
         };
         controller.callbackBlock = callbackBlock;        
+    }
+}
+
+- (BOOL) shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
+    NSIndexPath *indexPath = self.tableView.indexPathForSelectedRow;
+    if (indexPath.section == 0) {
+        return NO;
+    }
+    return YES;
+}
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) {
+        // Wont do anything in this app since we are already at the root
+        NSLog(@"would go back to the previous screen if we were not already at the root");
+        [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
